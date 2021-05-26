@@ -62,6 +62,10 @@ public class MainActivity extends AppCompatActivity {
                 postData(URL);
         });
 
+        findViewById(R.id.btnDelete).setOnClickListener(v -> {
+            deleteData(URL, txtId.getText().toString());
+        });
+
         ListView listView = findViewById(R.id.listView);
         adapter = new ArrayAdapter<JSONObject>(this, android.R.layout.simple_list_item_1);
         listView.setAdapter(adapter);
@@ -164,7 +168,6 @@ public class MainActivity extends AppCompatActivity {
     private void postData(String url) {
         JSONObject data = new JSONObject();
         try {
-//            data.put("id", txtId.getText().toString());
             data.put("bookName", txtName.getText().toString());
             data.put("author", txtAuthor.getText().toString());
             data.put("publishedYear", Integer.parseInt(txtYear.getText().toString()));
@@ -184,6 +187,24 @@ public class MainActivity extends AppCompatActivity {
                 error -> {
                     error.printStackTrace();
                     Toast.makeText(this, "Error when POST data", Toast.LENGTH_SHORT).show();
+                }
+        );
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+        queue.add(request);
+    }
+
+    private void deleteData(String url, String id) {
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.DELETE,
+                url + "/" + id,
+                null,
+                response -> {
+                    Toast.makeText(this, "DELETE thành công!", Toast.LENGTH_SHORT).show();
+                },
+                error -> {
+                    error.printStackTrace();
+                    Toast.makeText(this, "Error when DELETE data", Toast.LENGTH_SHORT).show();
                 }
         );
 
