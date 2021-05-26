@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -55,7 +56,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.btnSave).setOnClickListener(v -> {
-            
+            if(!txtId.getText().toString().isEmpty())
+                putData(URL, txtId.getText().toString());
+            else
+                postData(URL);
         });
 
         ListView listView = findViewById(R.id.listView);
@@ -127,49 +131,59 @@ public class MainActivity extends AppCompatActivity {
         queue.add(request);
     }
 
-    private void putData(String url) {
-        JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.PUT,
-                url,
-                null,
-                response -> {
-                    Toast.makeText(this, "PUT thành công!", Toast.LENGTH_SHORT).show();
-                },
-                error -> {
-                    Toast.makeText(this, "Error when put data", Toast.LENGTH_SHORT).show();
-                }
-        ){
-            @Nullable
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> params = new HashMap<>();
-                params.put("id", txtId.getText().toString());
-                params.put("bookName", txtName.getText().toString());
-                params.put("author", txtAuthor.getText().toString());
-                params.put("publishedYear", txtYear.getText().toString());
-
-                return params;
-            }
-        };
-
-        RequestQueue queue = Volley.newRequestQueue(this);
-        queue.add(request);
-    }
-
     private void putData(String url, String id) {
-        if(id.isEmpty()){
-            return;
+        JSONObject data = new JSONObject();
+        try {
+            data.put("id", txtId.getText().toString());
+            data.put("bookName", txtName.getText().toString());
+            data.put("author", txtAuthor.getText().toString());
+            data.put("publishedYear", Integer.parseInt(txtYear.getText().toString()));
+
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
         JsonObjectRequest request = new JsonObjectRequest(
                 Request.Method.PUT,
                 url + "/" + id,
-                null,
+                data,
                 response -> {
+                    Log.d("AAA", response.toString());
                     Toast.makeText(this, "PUT thành công!", Toast.LENGTH_SHORT).show();
                 },
                 error -> {
+                    error.printStackTrace();
                     Toast.makeText(this, "Error when put data", Toast.LENGTH_SHORT).show();
+                }
+        );
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+        queue.add(request);
+    }
+
+    private void postData(String url) {
+        JSONObject data = new JSONObject();
+        try {
+//            data.put("id", txtId.getText().toString());
+            data.put("bookName", txtName.getText().toString());
+            data.put("author", txtAuthor.getText().toString());
+            data.put("publishedYear", Integer.parseInt(txtYear.getText().toString()));
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                data,
+                response -> {
+                    Log.d("AAA", response.toString());
+                    Toast.makeText(this, "POST thành công!", Toast.LENGTH_SHORT).show();
+                },
+                error -> {
+                    error.printStackTrace();
+                    Toast.makeText(this, "Error when POST data", Toast.LENGTH_SHORT).show();
                 }
         );
 
